@@ -3,5 +3,6 @@ export const APP_NAME = 'Formnest';
 export const ROUTES = {
   HOME: '/',
   LOGIN: '/login',
+  SIGNUP: '/signup',
   DASHBOARD: '/dashboard',
 };
