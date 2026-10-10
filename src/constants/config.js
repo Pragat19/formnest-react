@@ -5,4 +5,7 @@ export const ROUTES = {
   LOGIN: '/login',
   SIGNUP: '/signup',
   DASHBOARD: '/dashboard',
+  TEMPLATES: '/templates',
+  FORM_BUILDER: '/form-builder/:id',
+  FORM_PREVIEW: '/form-preview/:id',
 };

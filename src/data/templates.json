@@ -1,0 +1,127 @@
+[
+  {
+    "id": "template_edu_student_details",
+    "name": "Student Details",
+    "category": "education",
+    "description": "Standard template to collect comprehensive student details including personal and academic information.",
+    "isBlank": false,
+    "gradient": "from-blue-500 to-indigo-500",
+    "formSettings": {
+      "isPublic": true,
+      "allowMultipleSubmissions": false
+    },
+    "schema": [
+      {
+        "id": "field_name",
+        "type": "short_answer",
+        "label": "Student Name",
+        "required": true,
+        "placeholder": "Enter full name"
+      },
+      {
+        "id": "field_enrollment",
+        "type": "number",
+        "label": "Enrollment No.",
+        "required": true,
+        "placeholder": "e.g., 2023000123"
+      },
+      {
+        "id": "field_email",
+        "type": "email",
+        "label": "Email Address",
+        "required": true,
+        "placeholder": "student@university.edu"
+      },
+      {
+        "id": "field_phone",
+        "type": "short_answer",
+        "label": "Phone Number",
+        "required": true,
+        "placeholder": "+1 234 567 8900"
+      },
+      {
+        "id": "field_gender",
+        "type": "dropdown",
+        "label": "Gender",
+        "required": true,
+        "options": [
+          "Male",
+          "Female",
+          "Non-binary",
+          "Prefer not to say"
+        ]
+      },
+      {
+        "id": "field_department",
+        "type": "multiple_choice",
+        "label": "Department",
+        "required": true,
+        "options": [
+          "Computer Science",
+          "Information Technology",
+          "Mechanical Engineering",
+          "Electrical Engineering",
+          "Civil Engineering",
+          "Business Administration",
+          "Arts & Humanities"
+        ]
+      },
+      {
+        "id": "field_semester",
+        "type": "dropdown",
+        "label": "Semester",
+        "required": true,
+        "options": [
+          "Semester 1",
+          "Semester 2",
+          "Semester 3",
+          "Semester 4",
+          "Semester 5",
+          "Semester 6",
+          "Semester 7",
+          "Semester 8"
+        ]
+      },
+      {
+        "id": "field_admission_date",
+        "type": "date",
+        "label": "Date of Admission",
+        "required": false
+      },
+      {
+        "id": "field_id_upload",
+        "type": "file_upload",
+        "label": "Upload Student ID Card",
+        "required": false,
+        "allowedExtensions": [".pdf", ".jpg", ".png"]
+      },
+      {
+        "id": "field_interests",
+        "type": "checkboxes",
+        "label": "Extracurricular Interests",
+        "required": false,
+        "options": [
+          "Sports & Athletics",
+          "Music & Arts",
+          "Debate Club",
+          "Coding & Tech Club",
+          "Student Council"
+        ]
+      },
+      {
+        "id": "field_enthusiasm_rating",
+        "type": "rating",
+        "label": "How excited are you for this academic year?",
+        "required": false,
+        "maxRating": 5
+      },
+      {
+        "id": "field_additional_notes",
+        "type": "long_answer",
+        "label": "Additional Notes / Special Accommodations",
+        "required": false,
+        "placeholder": "Please list any special requirements, allergies, or other notes here..."
+      }
+    ]
+  }
+]
