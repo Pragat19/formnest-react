@@ -1,15 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence, Reorder } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { APP_NAME, ROUTES } from '../constants/config';
 import { useAppContext } from '../context/AppContext';
 import Dropdown from '../components/Dropdown';
 import templatesData from '../data/templates.json';
 import { 
   ArrowLeft, Eye, Save, Settings, Share2, Type, 
-  Hash, Mail, Phone, ChevronDown, CheckSquare, 
+  Hash, Mail, Phone, ChevronDown, ChevronLeft, CheckSquare, 
   Calendar, Upload, Star, AlignLeft, Grid, MoreVertical, Plus, Trash2, Copy, GripVertical, ArrowUp, ArrowDown,
-  X, Users, Link
+  X, Users, Link, Layers, Pencil, Check, SplitSquareVertical
 } from 'lucide-react';
 
 const FIELD_TYPES = [
@@ -37,6 +37,13 @@ const FormEditor = () => {
   const [saveStatus, setSaveStatus] = useState('');
   const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [editingPartitionId, setEditingPartitionId] = useState(null);
+  const [partitionNameDraft, setPartitionNameDraft] = useState('');
+  // For add-partition-at-position modal
+  const [addPartitionAt, setAddPartitionAt] = useState(null); // index to insert after, or null
+  const [partitionModalOpen, setPartitionModalOpen] = useState(false);
+  const [newPartitionName, setNewPartitionName] = useState('');
+  const [newPartitionAllowBack, setNewPartitionAllowBack] = useState(true);
   const scrollContainerRef = useRef(null);
 
   useEffect(() => {
@@ -109,9 +116,42 @@ const FormEditor = () => {
     setActiveFieldId(newField.id);
   };
 
+  // Open modal to add partition at a specific position
+  const openAddPartitionModal = (insertAfterIndex) => {
+    setAddPartitionAt(insertAfterIndex);
+    setNewPartitionName('');
+    setNewPartitionAllowBack(true);
+    setPartitionModalOpen(true);
+  };
+
+  const confirmAddPartition = () => {
+    const name = newPartitionName.trim() || 'New Section';
+    const newPartition = {
+      id: 'partition_' + Date.now(),
+      type: '__partition__',
+      label: name,
+      allowBack: newPartitionAllowBack,
+    };
+    const insertIndex = addPartitionAt === null ? formData.schema.length : addPartitionAt + 1;
+    const newSchema = [...formData.schema];
+    newSchema.splice(insertIndex, 0, newPartition);
+    setFormData({ ...formData, schema: newSchema });
+    setPartitionModalOpen(false);
+    setNewPartitionName('');
+    setNewPartitionAllowBack(true);
+    setAddPartitionAt(null);
+  };
+
   const deleteField = (fieldId) => {
     setFormData({ ...formData, schema: formData.schema.filter(f => f.id !== fieldId) });
     if (activeFieldId === fieldId) setActiveFieldId(null);
+  };
+
+  const updatePartitionName = (partitionId, name) => {
+    const newSchema = formData.schema.map(f =>
+      f.id === partitionId ? { ...f, label: name } : f
+    );
+    setFormData({ ...formData, schema: newSchema });
   };
 
   const updateFormSettings = (updates) => {
@@ -158,21 +198,20 @@ const FormEditor = () => {
   const handleDrag = (e) => {
     if (!scrollContainerRef.current) return;
     const { clientY } = e;
-    if (clientY === 0) return; // Ignore final drop coordinate where clientY is 0
-
+    if (clientY === 0) return;
     const container = scrollContainerRef.current;
     const { top, bottom } = container.getBoundingClientRect();
-    
-    // Auto-scroll threshold from edge (pixels)
     const threshold = 100;
     const scrollSpeed = 15;
-    
     if (clientY - top < threshold) {
       container.scrollTop -= scrollSpeed;
     } else if (bottom - clientY < threshold) {
       container.scrollTop += scrollSpeed;
     }
   };
+
+  // Count partitions for display
+  const partitionCount = formData.schema.filter(f => f.type === '__partition__').length;
 
   return (
     <div className="h-screen flex flex-col bg-slate-50 font-sans text-slate-900 overflow-hidden selection:bg-indigo-500/30">
@@ -222,6 +261,23 @@ const FormEditor = () => {
             <h2 className="text-sm font-bold text-slate-800 uppercase tracking-wider">Form Elements</h2>
           </div>
           <div className="p-3 overflow-y-auto custom-scrollbar flex-1">
+            {/* Add Partition Button */}
+            <div className="mb-4">
+              <button
+                onClick={() => openAddPartitionModal(null)}
+                className="w-full flex items-center justify-center gap-2 px-3 py-2.5 bg-gradient-to-r from-violet-50 to-indigo-50 border border-indigo-200 rounded-lg cursor-pointer hover:from-violet-100 hover:to-indigo-100 hover:border-indigo-300 transition-all text-indigo-700 font-medium text-sm group"
+              >
+                <SplitSquareVertical size={16} className="text-indigo-500 group-hover:text-indigo-600" />
+                Add Section / Partition
+              </button>
+              {partitionCount > 0 && (
+                <p className="text-[10px] text-slate-400 text-center mt-1.5">
+                  {partitionCount} partition{partitionCount > 1 ? 's' : ''} in form
+                </p>
+              )}
+            </div>
+
+            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 px-1">Fields</div>
             <div className="grid grid-cols-2 gap-2">
               {FIELD_TYPES.map(ft => (
                 <div 
@@ -268,7 +324,112 @@ const FormEditor = () => {
                 {formData.schema.map((field, index) => {
                   const isActive = activeFieldId === field.id;
                   const isDragged = draggedIndex === index;
-                  
+
+                  // --- Partition Divider ---
+                  if (field.type === '__partition__') {
+                    return (
+                      <motion.div
+                        layout
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+                        key={field.id}
+                        className="relative group"
+                        draggable
+                        onDragStart={(e) => handleDragStart(e, index)}
+                        onDragOver={handleDragOver}
+                        onDrop={(e) => handleDrop(e, index)}
+                        onDragEnd={handleDragEnd}
+                        onDrag={handleDrag}
+                      >
+                        {/* Partition Header Card */}
+                        <div className="bg-gradient-to-r from-indigo-600 to-violet-600 rounded-xl shadow-md px-6 py-4 flex items-center justify-between gap-3">
+                          <div className="flex items-center gap-3 flex-1 min-w-0">
+                            <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center flex-shrink-0">
+                              <Layers size={16} className="text-white" />
+                            </div>
+                            {editingPartitionId === field.id ? (
+                              <input
+                                autoFocus
+                                value={partitionNameDraft}
+                                onChange={e => setPartitionNameDraft(e.target.value)}
+                                onKeyDown={e => {
+                                  if (e.key === 'Enter') {
+                                    updatePartitionName(field.id, partitionNameDraft || 'New Section');
+                                    setEditingPartitionId(null);
+                                  }
+                                  if (e.key === 'Escape') setEditingPartitionId(null);
+                                }}
+                                className="flex-1 bg-white/20 text-white placeholder-white/60 font-bold text-base rounded-md px-3 py-1 focus:outline-none focus:bg-white/30 border border-white/30"
+                                placeholder="Section name..."
+                              />
+                            ) : (
+                              <span className="font-bold text-white text-base truncate">{field.label || 'New Section'}</span>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-1 flex-shrink-0">
+                            {editingPartitionId === field.id ? (
+                              <button
+                                onClick={() => {
+                                  updatePartitionName(field.id, partitionNameDraft || 'New Section');
+                                  setEditingPartitionId(null);
+                                }}
+                                className="p-1.5 bg-white/20 hover:bg-white/30 text-white rounded-md transition-colors"
+                                title="Save name"
+                              >
+                                <Check size={14} />
+                              </button>
+                            ) : (
+                              <button
+                                onClick={() => {
+                                  setEditingPartitionId(field.id);
+                                  setPartitionNameDraft(field.label || '');
+                                }}
+                                className="p-1.5 bg-white/20 hover:bg-white/30 text-white rounded-md transition-colors opacity-0 group-hover:opacity-100"
+                                title="Rename section"
+                              >
+                                <Pencil size={14} />
+                              </button>
+                            )}
+                            <button
+                              onClick={() => deleteField(field.id)}
+                              className="p-1.5 bg-white/20 hover:bg-red-400/40 text-white rounded-md transition-colors opacity-0 group-hover:opacity-100"
+                              title="Delete section"
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                            <div className="p-1.5 text-white/60 cursor-grab" title="Drag to reorder">
+                              <GripVertical size={14} />
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Add field or partition below this partition */}
+                        <div className="absolute -bottom-[24px] left-0 right-0 h-8 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-20 pointer-events-none">
+                          <div className="w-full h-px bg-indigo-300 absolute pointer-events-none"></div>
+                          <div className="flex gap-2 relative">
+                            <button 
+                              onClick={(e) => { e.stopPropagation(); addField('short_answer', index + 1); }} 
+                              className="bg-white border border-indigo-300 text-indigo-500 hover:bg-indigo-50 hover:text-indigo-600 rounded-full p-1.5 transition-colors shadow-sm pointer-events-auto"
+                              title="Add question here"
+                            >
+                              <Plus size={16} />
+                            </button>
+                            <button 
+                              onClick={(e) => { e.stopPropagation(); openAddPartitionModal(index); }} 
+                              className="bg-white border border-violet-300 text-violet-500 hover:bg-violet-50 hover:text-violet-600 rounded-full p-1.5 transition-colors shadow-sm pointer-events-auto"
+                              title="Add section here"
+                            >
+                              <SplitSquareVertical size={16} />
+                            </button>
+                          </div>
+                        </div>
+                      </motion.div>
+                    );
+                  }
+
+                  // --- Regular Field ---
                   return (
                     <motion.div 
                       layout
@@ -356,16 +517,25 @@ const FormEditor = () => {
                       </div>
                     </div>
 
-                    {/* Inline Add Button between fields */}
+                    {/* Inline Add Buttons between fields */}
                     <div className="absolute -bottom-[24px] left-0 right-0 h-8 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-20 pointer-events-none">
                       <div className="w-full h-px bg-indigo-300 absolute pointer-events-none"></div>
-                      <button 
-                        onClick={(e) => { e.stopPropagation(); addField('short_answer', index + 1); }} 
-                        className="relative bg-white border border-indigo-300 text-indigo-500 hover:bg-indigo-50 hover:text-indigo-600 rounded-full p-1.5 transition-colors shadow-sm pointer-events-auto"
-                        title="Add question here"
-                      >
-                        <Plus size={16} />
-                      </button>
+                      <div className="flex gap-2 relative">
+                        <button 
+                          onClick={(e) => { e.stopPropagation(); addField('short_answer', index + 1); }} 
+                          className="bg-white border border-indigo-300 text-indigo-500 hover:bg-indigo-50 hover:text-indigo-600 rounded-full p-1.5 transition-colors shadow-sm pointer-events-auto"
+                          title="Add question here"
+                        >
+                          <Plus size={16} />
+                        </button>
+                        <button 
+                          onClick={(e) => { e.stopPropagation(); openAddPartitionModal(index); }} 
+                          className="bg-white border border-violet-300 text-violet-500 hover:bg-violet-50 hover:text-violet-600 rounded-full p-1.5 transition-colors shadow-sm pointer-events-auto"
+                          title="Add section/partition here"
+                        >
+                          <SplitSquareVertical size={16} />
+                        </button>
+                      </div>
                     </div>
                   </motion.div>
                 );
@@ -440,16 +610,6 @@ const FormEditor = () => {
                   </button>
                 </div>
 
-                <div className="flex items-center justify-between py-2 border-b border-slate-100">
-                  <label className="text-sm font-semibold text-slate-700">Show progress bar</label>
-                  <button 
-                    onClick={() => updateFormSettings({ showProgressBar: !(formData.settings?.showProgressBar) })}
-                    className={`w-10 h-5 rounded-full transition-colors relative flex-shrink-0 ${formData.settings?.showProgressBar ? 'bg-indigo-600' : 'bg-slate-300'}`}
-                  >
-                    <div className={`w-3.5 h-3.5 bg-white rounded-full absolute top-[3px] transition-transform ${formData.settings?.showProgressBar ? 'translate-x-[22px]' : 'translate-x-[3px]'}`}></div>
-                  </button>
-                </div>
-
                 <div>
                   <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Confirmation Message</label>
                   <textarea 
@@ -459,6 +619,21 @@ const FormEditor = () => {
                     rows={3}
                   />
                 </div>
+
+                {/* Sections Overview */}
+                {partitionCount > 0 && (
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Sections ({partitionCount})</label>
+                    <div className="space-y-2">
+                      {formData.schema.filter(f => f.type === '__partition__').map((p, i) => (
+                        <div key={p.id} className="flex items-center gap-2 px-3 py-2 bg-indigo-50 border border-indigo-100 rounded-lg">
+                          <div className="w-5 h-5 rounded bg-indigo-600 flex items-center justify-center text-white text-[10px] font-bold flex-shrink-0">{i + 1}</div>
+                          <span className="text-sm font-medium text-indigo-800 truncate">{p.label}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             ) : (
               <div className="space-y-6">
@@ -632,6 +807,86 @@ const FormEditor = () => {
         </aside>
 
       </div>
+
+      {/* Add Partition Modal */}
+      <AnimatePresence>
+        {partitionModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} 
+              className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"
+              onClick={() => setPartitionModalOpen(false)}
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 10 }}
+              className="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden relative z-10"
+            >
+              <div className="bg-gradient-to-r from-indigo-600 to-violet-600 px-6 py-5">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+                    <SplitSquareVertical size={20} className="text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-white">Add Section</h3>
+                    <p className="text-white/70 text-sm">Create a new partition in your form</p>
+                  </div>
+                </div>
+              </div>
+              <div className="p-6 space-y-5">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Section Name</label>
+                  <input
+                    autoFocus
+                    type="text"
+                    value={newPartitionName}
+                    onChange={e => setNewPartitionName(e.target.value)}
+                    onKeyDown={e => { if (e.key === 'Enter') confirmAddPartition(); if (e.key === 'Escape') setPartitionModalOpen(false); }}
+                    placeholder="e.g. Personal Details, Work Experience..."
+                    className="w-full border border-slate-200 rounded-lg px-4 py-3 text-sm text-slate-900 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+                  />
+                  <p className="text-xs text-slate-400 mt-2">Leave blank to use "New Section"</p>
+                </div>
+
+                {/* Allow Backward Navigation Toggle */}
+                <div className={`flex items-center justify-between p-4 rounded-xl border-2 transition-all cursor-pointer select-none ${newPartitionAllowBack ? 'border-indigo-300 bg-indigo-50/60' : 'border-slate-200 bg-slate-50'}`}
+                  onClick={() => setNewPartitionAllowBack(v => !v)}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={`w-9 h-9 rounded-lg flex items-center justify-center transition-all ${newPartitionAllowBack ? 'bg-indigo-100' : 'bg-slate-200'}`}>
+                      <ChevronLeft size={18} className={newPartitionAllowBack ? 'text-indigo-600' : 'text-slate-400'} />
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-slate-800">Allow Backward Navigation</p>
+                      <p className="text-xs text-slate-500 mt-0.5">
+                        {newPartitionAllowBack ? 'Back button will be visible to responders' : 'Responders cannot go back from this section'}
+                      </p>
+                    </div>
+                  </div>
+                  <div className={`w-11 h-6 rounded-full transition-colors relative flex-shrink-0 ml-3 ${newPartitionAllowBack ? 'bg-indigo-600' : 'bg-slate-300'}`}>
+                    <div className={`w-4 h-4 bg-white rounded-full absolute top-1 transition-transform shadow-sm ${newPartitionAllowBack ? 'translate-x-[26px]' : 'translate-x-1'}`} />
+                  </div>
+                </div>
+              </div>
+              <div className="px-6 pb-6 flex gap-3">
+                <button
+                  onClick={() => setPartitionModalOpen(false)}
+                  className="flex-1 px-4 py-2.5 border border-slate-200 text-slate-600 rounded-lg text-sm font-medium hover:bg-slate-50 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmAddPartition}
+                  className="flex-1 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-semibold transition-colors"
+                >
+                  Add Section
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* Publish Modal */}
       <AnimatePresence>
