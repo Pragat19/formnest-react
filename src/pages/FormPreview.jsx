@@ -95,7 +95,14 @@ const FormPreview = () => {
     for (const field of currentSegment.fields) {
       if (field.required) {
         const val = answers[field.id];
-        if (val === undefined || val === '' || val === null || (Array.isArray(val) && val.length === 0)) {
+        if (field.type === 'multiple_choice_grid') {
+          // Each row must have exactly one column selected
+          const rowAnswers = val || {};
+          const unansweredRows = (field.rows || []).filter((_, ri) => !rowAnswers[ri]);
+          if (unansweredRows.length > 0) {
+            newErrors[field.id] = 'Please select one option per row';
+          }
+        } else if (val === undefined || val === '' || val === null || (Array.isArray(val) && val.length === 0)) {
           newErrors[field.id] = 'This field is required';
         }
       }
@@ -285,6 +292,113 @@ const FormPreview = () => {
                   />
                 );
               })}
+            </div>
+            {hasError && (
+              <div className="flex items-center gap-1.5 mt-2 text-rose-500 text-sm">
+                <AlertCircle size={14} />
+                <span>{errors[field.id]}</span>
+              </div>
+            )}
+          </div>
+        );
+      case 'multiple_choice_grid':
+        return (
+          <div>
+            {field.helpText && <p className="text-[14px] text-[#3C3C43]/60 mb-3">{field.helpText}</p>}
+            <div className={`overflow-x-auto rounded-[14px] ${hasError ? 'ring-2 ring-rose-400/40 bg-rose-50/30 p-1' : ''}`}>
+              <table className="w-full border-collapse text-sm">
+                <thead>
+                  <tr>
+                    <th className="text-left py-2 px-3 text-[#3C3C43]/50 font-medium text-[13px] min-w-[140px]"></th>
+                    {(field.columns || []).map((col, ci) => (
+                      <th key={ci} className="text-center py-2 px-3 text-[13px] font-semibold text-[#3C3C43]/70">{col}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {(field.rows || []).map((row, ri) => {
+                    const selected = (answers[field.id] || {})[ri];
+                    return (
+                      <tr key={ri} className={ri % 2 === 0 ? 'bg-[#767680]/5 rounded-xl' : ''}>
+                        <td className="py-3 px-3 text-[15px] text-black font-medium">{row}</td>
+                        {(field.columns || []).map((col, ci) => (
+                          <td key={ci} className="text-center py-3 px-3">
+                            <label className="cursor-pointer inline-flex items-center justify-center">
+                              <input
+                                type="radio"
+                                name={`${field.id}_row_${ri}`}
+                                value={col}
+                                checked={selected === col}
+                                onChange={() => {
+                                  const prev = answers[field.id] || {};
+                                  setAnswer(field.id, { ...prev, [ri]: col });
+                                }}
+                                className="w-5 h-5 accent-blue-500"
+                              />
+                            </label>
+                          </td>
+                        ))}
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+            {hasError && (
+              <div className="flex items-center gap-1.5 mt-2 text-rose-500 text-sm">
+                <AlertCircle size={14} />
+                <span>{errors[field.id]}</span>
+              </div>
+            )}
+          </div>
+        );
+      case 'tick_box_grid':
+        return (
+          <div>
+            {field.helpText && <p className="text-[14px] text-[#3C3C43]/60 mb-3">{field.helpText}</p>}
+            <div className={`overflow-x-auto rounded-[14px] ${hasError ? 'ring-2 ring-rose-400/40 bg-rose-50/30 p-1' : ''}`}>
+              <table className="w-full border-collapse text-sm">
+                <thead>
+                  <tr>
+                    <th className="text-left py-2 px-3 text-[#3C3C43]/50 font-medium text-[13px] min-w-[140px]"></th>
+                    {(field.columns || []).map((col, ci) => (
+                      <th key={ci} className="text-center py-2 px-3 text-[13px] font-semibold text-[#3C3C43]/70">{col}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {(field.rows || []).map((row, ri) => {
+                    const rowChecked = ((answers[field.id] || {})[ri]) || [];
+                    return (
+                      <tr key={ri} className={ri % 2 === 0 ? 'bg-[#767680]/5' : ''}>
+                        <td className="py-3 px-3 text-[15px] text-black font-medium">{row}</td>
+                        {(field.columns || []).map((col, ci) => {
+                          const isChecked = rowChecked.includes(col);
+                          return (
+                            <td key={ci} className="text-center py-3 px-3">
+                              <label className="cursor-pointer inline-flex items-center justify-center">
+                                <input
+                                  type="checkbox"
+                                  checked={isChecked}
+                                  onChange={(e) => {
+                                    const prev = answers[field.id] || {};
+                                    const prevRow = prev[ri] || [];
+                                    const newRow = e.target.checked
+                                      ? [...prevRow, col]
+                                      : prevRow.filter(v => v !== col);
+                                    setAnswer(field.id, { ...prev, [ri]: newRow });
+                                  }}
+                                  className="w-5 h-5 accent-blue-500 rounded-[4px]"
+                                />
+                              </label>
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
             </div>
             {hasError && (
               <div className="flex items-center gap-1.5 mt-2 text-rose-500 text-sm">

@@ -4,8 +4,9 @@ import { APP_NAME } from '../constants/config';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '../constants/config';
+import templatesData from '../data/templates.json';
 import { 
-  Search, Plus, LayoutTemplate, Clock, MoreVertical, 
+  Search, Plus, Clock, MoreVertical, 
   BarChart2, Users, FileText, ChevronDown, Bell, Settings,
   Grid, List as ListIcon, Filter
 } from 'lucide-react';
@@ -17,10 +18,13 @@ const STATS = [
 ];
 
 const TEMPLATES = [
-  { id: 1, name: 'Blank Form', icon: Plus, isBlank: true, gradient: 'from-violet-500 to-fuchsia-500' },
-  { id: 2, name: 'Customer Feedback', icon: LayoutTemplate, gradient: 'from-blue-500 to-cyan-500' },
-  { id: 3, name: 'Event RSVP', icon: LayoutTemplate, gradient: 'from-emerald-500 to-teal-500' },
-  { id: 4, name: 'Job Application', icon: LayoutTemplate, gradient: 'from-orange-500 to-amber-500' },
+  { id: 'blank', name: 'Add New', isBlank: true, gradient: 'from-violet-500 to-fuchsia-500' },
+  ...templatesData.slice(0, 3).map((template) => ({
+    id: template.id,
+    name: template.name,
+    isBlank: false,
+    gradient: template.gradient || 'from-indigo-500 to-purple-500',
+  })),
 ];
 
 const RECENT_FORMS = [
@@ -157,6 +161,7 @@ const Dashboard = () => {
                 transition={{ delay: 0.2 + (idx * 0.05) }}
                 key={template.id} 
                 className="group cursor-pointer flex flex-col gap-3"
+                onClick={() => window.open(`/form-builder/${template.id}`, '_blank')}
               >
                 <div className={`aspect-video rounded-2xl p-0.5 transition-all duration-300 ${template.isBlank ? 'bg-gradient-to-br ' + template.gradient + ' shadow-lg shadow-indigo-500/20 hover:shadow-xl hover:shadow-indigo-500/30' : 'bg-white border border-slate-200 hover:border-slate-300 shadow-sm hover:shadow-md'}`}>
                   <div className={`w-full h-full rounded-[14px] flex items-center justify-center ${template.isBlank ? 'bg-white/10 backdrop-blur-sm' : 'bg-slate-50 group-hover:bg-slate-100 transition-colors'}`}>

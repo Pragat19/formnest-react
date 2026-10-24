@@ -17,6 +17,8 @@ const FIELD_TYPES = [
   { id: 'long_answer', label: 'Paragraph', icon: AlignLeft },
   { id: 'multiple_choice', label: 'Multiple Choice', icon: Grid },
   { id: 'checkboxes', label: 'Checkboxes', icon: CheckSquare },
+  { id: 'multiple_choice_grid', label: 'MC Grid', icon: Grid },
+  { id: 'tick_box_grid', label: 'Tick Box Grid', icon: CheckSquare },
   { id: 'dropdown', label: 'Dropdown', icon: ChevronDown },
   { id: 'number', label: 'Number', icon: Hash },
   { id: 'email', label: 'Email', icon: Mail },
@@ -103,7 +105,8 @@ const FormEditor = () => {
       type: type,
       label: 'New Question',
       required: false,
-      ...( ['multiple_choice', 'checkboxes', 'dropdown'].includes(type) ? { options: ['Option 1'] } : {} )
+      ...( ['multiple_choice', 'checkboxes', 'dropdown'].includes(type) ? { options: ['Option 1'] } : {} ),
+      ...( ['multiple_choice_grid', 'tick_box_grid'].includes(type) ? { rows: ['Row 1', 'Row 2'], columns: ['Column 1', 'Column 2', 'Column 3'] } : {} )
     };
     
     if (insertIndex !== null) {
@@ -492,6 +495,32 @@ const FormEditor = () => {
                             ))}
                           </div>
                         )}
+                        {(field.type === 'multiple_choice_grid' || field.type === 'tick_box_grid') && (
+                          <div className="overflow-x-auto">
+                            <table className="w-full text-xs border-collapse">
+                              <thead>
+                                <tr>
+                                  <th className="text-left py-1.5 pr-3 text-slate-400 font-medium w-36"></th>
+                                  {(field.columns || ['Col 1']).map((col, ci) => (
+                                    <th key={ci} className="text-center py-1.5 px-2 text-slate-500 font-medium">{col}</th>
+                                  ))}
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {(field.rows || ['Row 1']).map((row, ri) => (
+                                  <tr key={ri} className={ri % 2 === 0 ? 'bg-slate-50/60' : ''}>
+                                    <td className="py-2 pr-3 text-slate-600 text-xs">{row}</td>
+                                    {(field.columns || ['Col 1']).map((_, ci) => (
+                                      <td key={ci} className="text-center py-2 px-2">
+                                        <div className={`w-3.5 h-3.5 border border-slate-300 mx-auto ${ field.type === 'tick_box_grid' ? 'rounded' : 'rounded-full'}`}></div>
+                                      </td>
+                                    ))}
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        )}
                         {field.type === 'dropdown' && (
                           <div className="border border-slate-300 rounded-md px-4 py-2 w-2/3 flex items-center justify-between text-slate-400 text-sm">
                             <span>Select an option</span>
@@ -798,6 +827,109 @@ const FormEditor = () => {
                         { value: 10, label: '10 Stars' }
                       ]}
                     />
+                  </div>
+                )}
+
+                {/* Grid Rows & Columns (multiple_choice_grid / tick_box_grid) */}
+                {['multiple_choice_grid', 'tick_box_grid'].includes(activeField.type) && (
+                  <div className="space-y-5">
+                    {/* Help Text */}
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Help Text</label>
+                      <textarea
+                        value={activeField.helpText || ''}
+                        onChange={(e) => updateActiveField({ helpText: e.target.value })}
+                        className="w-full bg-slate-50 border border-slate-200 rounded-md px-3 py-2 text-sm text-slate-900 focus:outline-none focus:border-indigo-500 focus:bg-white resize-none"
+                        rows={2}
+                        placeholder="Optional sub-label..."
+                      />
+                    </div>
+
+                    {/* Rows */}
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
+                        Rows <span className="text-indigo-500 normal-case ml-1">({(activeField.rows || []).length})</span>
+                      </label>
+                      <div className="space-y-2">
+                        {(activeField.rows || []).map((row, idx) => (
+                          <div key={idx} className="flex items-center gap-2">
+                            <input
+                              type="text"
+                              value={row}
+                              onChange={(e) => {
+                                const newRows = [...(activeField.rows || [])];
+                                newRows[idx] = e.target.value;
+                                updateActiveField({ rows: newRows });
+                              }}
+                              className="flex-1 bg-white border border-slate-200 rounded-md px-3 py-1.5 text-sm focus:outline-none focus:border-indigo-500"
+                              placeholder={`Row ${idx + 1}`}
+                            />
+                            <button
+                              onClick={() => {
+                                const newRows = (activeField.rows || []).filter((_, i) => i !== idx);
+                                updateActiveField({ rows: newRows.length ? newRows : ['Row 1'] });
+                              }}
+                              className="p-1.5 text-slate-400 hover:text-rose-500 transition-colors"
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                          </div>
+                        ))}
+                        <button
+                          onClick={() => updateActiveField({ rows: [...(activeField.rows || []), `Row ${(activeField.rows?.length || 0) + 1}`] })}
+                          className="flex items-center gap-1 text-sm font-medium text-indigo-600 hover:text-indigo-700 mt-1"
+                        >
+                          <Plus size={14} /> Add Row
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Columns */}
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
+                        Columns <span className="text-indigo-500 normal-case ml-1">({(activeField.columns || []).length})</span>
+                      </label>
+                      <div className="space-y-2">
+                        {(activeField.columns || []).map((col, idx) => (
+                          <div key={idx} className="flex items-center gap-2">
+                            <input
+                              type="text"
+                              value={col}
+                              onChange={(e) => {
+                                const newCols = [...(activeField.columns || [])];
+                                newCols[idx] = e.target.value;
+                                updateActiveField({ columns: newCols });
+                              }}
+                              className="flex-1 bg-white border border-slate-200 rounded-md px-3 py-1.5 text-sm focus:outline-none focus:border-indigo-500"
+                              placeholder={`Column ${idx + 1}`}
+                            />
+                            <button
+                              onClick={() => {
+                                const newCols = (activeField.columns || []).filter((_, i) => i !== idx);
+                                updateActiveField({ columns: newCols.length ? newCols : ['Column 1'] });
+                              }}
+                              className="p-1.5 text-slate-400 hover:text-rose-500 transition-colors"
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                          </div>
+                        ))}
+                        <button
+                          onClick={() => updateActiveField({ columns: [...(activeField.columns || []), `Column ${(activeField.columns?.length || 0) + 1}`] })}
+                          className="flex items-center gap-1 text-sm font-medium text-indigo-600 hover:text-indigo-700 mt-1"
+                        >
+                          <Plus size={14} /> Add Column
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Grid Type Badge */}
+                    <div className="rounded-lg bg-indigo-50 border border-indigo-100 px-3 py-2.5 flex items-center gap-2 text-xs text-indigo-700">
+                      {activeField.type === 'tick_box_grid' ? <CheckSquare size={13} /> : <Grid size={13} />}
+                      <span className="font-medium">
+                        {activeField.type === 'tick_box_grid' ? 'Tick Box Grid — multiple selections per row' : 'Multiple Choice Grid — single selection per row'}
+                      </span>
+                    </div>
                   </div>
                 )}
 

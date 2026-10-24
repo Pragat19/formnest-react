@@ -18,28 +18,13 @@ const CATEGORIES = [
 ];
 
 const TEMPLATES = [
-  // JSON Templates
-  ...templatesData.map((t, idx) => ({
+  ...templatesData.map((t) => ({
     id: t.id,
     category: t.category,
     name: t.name,
     isBlank: t.isBlank || false,
     gradient: t.gradient || 'from-indigo-500 to-purple-500'
   })),
-  // Recently Used
-  { id: 'recent_1', category: 'recent', name: 'Customer Feedback', isBlank: false, gradient: 'from-blue-500 to-cyan-500' },
-  { id: 'recent_2', category: 'recent', name: 'Event RSVP', isBlank: false, gradient: 'from-emerald-500 to-teal-500' },
-  // Education
-  { id: 4, category: 'education', name: 'Quiz Assignment', isBlank: false, gradient: 'from-orange-500 to-amber-500' },
-  { id: 5, category: 'education', name: 'Class Registration', isBlank: false, gradient: 'from-blue-500 to-cyan-500' },
-  // Personal
-  { id: 6, category: 'personal', name: 'Contact Information', isBlank: false, gradient: 'from-rose-500 to-pink-500' },
-  { id: 7, category: 'personal', name: 'Find a Time', isBlank: false, gradient: 'from-violet-500 to-purple-500' },
-  // Event
-  { id: 8, category: 'event', name: 'Party Invite', isBlank: false, gradient: 'from-fuchsia-500 to-pink-500' },
-  { id: 9, category: 'event', name: 'T-Shirt Sign Up', isBlank: false, gradient: 'from-yellow-400 to-orange-500' },
-  // My Templates
-  { id: 10, category: 'my-templates', name: 'Onboarding V2', isBlank: false, gradient: 'from-slate-600 to-slate-800' },
 ];
 
 const TemplateGallery = () => {

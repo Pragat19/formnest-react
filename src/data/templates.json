@@ -123,5 +123,532 @@
         "placeholder": "Please list any special requirements, allergies, or other notes here..."
       }
     ]
+  },
+  {
+    "id": "template_edu_university_quiz",
+        "name": "University Quiz",
+        "category": "education",
+        "description": "A simple, editable quiz template for university courses. Add your course questions and answer choices, then share it with students.",
+        "isBlank": false,
+        "gradient": "from-orange-500 to-amber-500",
+        "formSettings": {
+          "isPublic": true,
+          "allowMultipleSubmissions": false
+        },
+        "settings": {
+          "isQuiz": true
+        },
+        "schema": [
+          {
+            "id": "field_student_name",
+            "type": "short_answer",
+            "label": "Student Name",
+            "required": true,
+            "placeholder": "Enter your full name"
+          },
+          {
+            "id": "field_student_id",
+            "type": "short_answer",
+            "label": "Student ID",
+            "required": true,
+            "placeholder": "Enter your university student ID"
+          },
+          {
+            "id": "field_course",
+            "type": "short_answer",
+            "label": "Course / Subject",
+            "required": true,
+            "placeholder": "e.g., Introduction to Biology"
+          },
+          {
+            "id": "field_semester",
+            "type": "dropdown",
+            "label": "Semester",
+            "required": true,
+            "options": [
+              "Semester 1",
+              "Semester 2",
+              "Semester 3",
+              "Semester 4",
+              "Semester 5",
+              "Semester 6",
+              "Semester 7",
+              "Semester 8"
+            ]
+          },
+          {
+            "id": "field_question_1",
+            "type": "multiple_choice",
+            "label": "Question 1: What is the main topic covered in this course?",
+            "required": true,
+            "options": [
+              "Replace with answer option 1",
+              "Replace with answer option 2",
+              "Replace with answer option 3",
+              "Replace with answer option 4"
+            ]
+          },
+          {
+            "id": "field_question_2",
+            "type": "multiple_choice",
+            "label": "Question 2: Which concept best describes a key idea from the course?",
+            "required": true,
+            "options": [
+              "Replace with answer option 1",
+              "Replace with answer option 2",
+              "Replace with answer option 3",
+              "Replace with answer option 4"
+            ]
+          },
+          {
+            "id": "field_question_3",
+            "type": "multiple_choice",
+            "label": "Question 3: Which example applies the course material correctly?",
+            "required": true,
+            "options": [
+              "Replace with answer option 1",
+              "Replace with answer option 2",
+              "Replace with answer option 3",
+              "Replace with answer option 4"
+            ]
+          },
+          {
+            "id": "field_question_4",
+            "type": "multiple_choice",
+            "label": "Question 4: Which statement about the course material is accurate?",
+            "required": true,
+            "options": [
+              "Replace with answer option 1",
+              "Replace with answer option 2",
+              "Replace with answer option 3",
+              "Replace with answer option 4"
+            ]
+          },
+          {
+            "id": "field_additional_comments",
+            "type": "long_answer",
+            "label": "Additional Comments",
+            "required": false,
+            "placeholder": "Optional feedback for your instructor"
+          }
+        ]
+      },
+      {
+        "id": "template_edu_faculty_feedback",
+    "name": "Faculty Feedback Form",
+    "category": "education",
+    "description": "A comprehensive faculty evaluation form for students to rate teaching quality, course content, and overall experience using grid-based multiple choice questions.",
+    "isBlank": false,
+    "gradient": "from-violet-500 to-purple-600",
+    "formSettings": {
+      "isPublic": true,
+      "allowMultipleSubmissions": false
+    },
+    "schema": [
+      {
+        "id": "field_student_name",
+        "type": "short_answer",
+        "label": "Student Name",
+        "required": false,
+        "placeholder": "Enter your name (optional)"
+      },
+      {
+        "id": "field_faculty_name",
+        "type": "short_answer",
+        "label": "Faculty Name",
+        "required": true,
+        "placeholder": "Enter faculty member's name"
+      },
+      {
+        "id": "field_course",
+        "type": "short_answer",
+        "label": "Course / Subject",
+        "required": true,
+        "placeholder": "e.g., Data Structures & Algorithms"
+      },
+      {
+        "id": "field_semester",
+        "type": "dropdown",
+        "label": "Semester",
+        "required": true,
+        "options": ["Semester 1", "Semester 2", "Semester 3", "Semester 4", "Semester 5", "Semester 6", "Semester 7", "Semester 8"]
+      },
+      {
+        "id": "field_teaching_quality_grid",
+        "type": "multiple_choice_grid",
+        "label": "Teaching Quality Evaluation",
+        "required": true,
+        "helpText": "Please rate the following aspects of teaching quality (select one per row).",
+        "rows": [
+          "Clarity of explanations",
+          "Use of real-world examples",
+          "Pace of teaching",
+          "Ability to answer questions",
+          "Student engagement"
+        ],
+        "columns": ["Poor", "Fair", "Good", "Very Good", "Excellent"]
+      },
+      {
+        "id": "field_course_content_grid",
+        "type": "multiple_choice_grid",
+        "label": "Course Content & Materials",
+        "required": true,
+        "helpText": "Rate the following aspects related to the course content (select one per row).",
+        "rows": [
+          "Relevance of syllabus",
+          "Quality of study materials",
+          "Difficulty level",
+          "Coverage of topics"
+        ],
+        "columns": ["Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree"]
+      },
+      {
+        "id": "field_interaction_grid",
+        "type": "tick_box_grid",
+        "label": "Faculty Interaction & Support",
+        "required": false,
+        "helpText": "Check all that apply for each interaction area.",
+        "rows": [
+          "Accessible during office hours",
+          "Responds to emails promptly",
+          "Provides helpful feedback on assignments",
+          "Encourages questions in class"
+        ],
+        "columns": ["Always", "Often", "Sometimes", "Rarely"]
+      },
+      {
+        "id": "field_assessment_grid",
+        "type": "multiple_choice_grid",
+        "label": "Assessment & Grading",
+        "required": true,
+        "helpText": "Rate the following aspects of assessments and grading (select one per row).",
+        "rows": [
+          "Fairness of exams/assignments",
+          "Timely return of graded work",
+          "Clarity of grading criteria"
+        ],
+        "columns": ["Very Poor", "Poor", "Average", "Good", "Excellent"]
+      },
+      {
+        "id": "field_overall_rating",
+        "type": "rating",
+        "label": "Overall Faculty Rating",
+        "required": true,
+        "maxRating": 5
+      },
+      {
+        "id": "field_suggestions",
+        "type": "long_answer",
+        "label": "Suggestions for Improvement",
+        "required": false,
+        "placeholder": "Share any suggestions to help the faculty improve the course or teaching style..."
+      }
+    ]
+  },
+  {
+    "id": "template_personal_contact",
+    "name": "Contact Information",
+    "category": "personal",
+    "description": "Collect essential contact details and a preferred way to get in touch.",
+    "isBlank": false,
+    "gradient": "from-rose-500 to-pink-500",
+    "formSettings": {
+      "isPublic": true,
+      "allowMultipleSubmissions": false
+    },
+    "schema": [
+      {
+        "id": "field_contact_name",
+        "type": "short_answer",
+        "label": "Full Name",
+        "required": true,
+        "placeholder": "Enter your full name"
+      },
+      {
+        "id": "field_contact_email",
+        "type": "email",
+        "label": "Email Address",
+        "required": true,
+        "placeholder": "you@example.com"
+      },
+      {
+        "id": "field_contact_phone",
+        "type": "short_answer",
+        "label": "Phone Number",
+        "required": false,
+        "placeholder": "Enter your phone number"
+      },
+      {
+        "id": "field_contact_method",
+        "type": "multiple_choice",
+        "label": "Preferred Contact Method",
+        "required": true,
+        "options": ["Email", "Phone", "Text Message"]
+      },
+      {
+        "id": "field_contact_notes",
+        "type": "long_answer",
+        "label": "Additional Information",
+        "required": false,
+        "placeholder": "Share any other details you would like us to know"
+      }
+    ]
+  },
+  {
+    "id": "template_personal_goal_planner",
+    "name": "Personal Goal Planner",
+    "category": "personal",
+    "description": "Plan a personal goal by capturing its category, target date, priorities, and next steps.",
+    "isBlank": false,
+    "gradient": "from-violet-500 to-purple-500",
+    "formSettings": {
+      "isPublic": true,
+      "allowMultipleSubmissions": false
+    },
+    "schema": [
+      {
+        "id": "field_goal_name",
+        "type": "short_answer",
+        "label": "What is your goal?",
+        "required": true,
+        "placeholder": "e.g., Build a regular exercise habit"
+      },
+      {
+        "id": "field_goal_category",
+        "type": "dropdown",
+        "label": "Goal Category",
+        "required": true,
+        "options": ["Health", "Learning", "Career", "Finance", "Relationships", "Other"]
+      },
+      {
+        "id": "field_goal_target_date",
+        "type": "date",
+        "label": "Target Date",
+        "required": false
+      },
+      {
+        "id": "field_goal_priority",
+        "type": "multiple_choice",
+        "label": "How important is this goal to you?",
+        "required": true,
+        "options": ["High", "Medium", "Low"]
+      },
+      {
+        "id": "field_goal_steps",
+        "type": "long_answer",
+        "label": "What steps will help you reach this goal?",
+        "required": true,
+        "placeholder": "List your first steps and any support you may need"
+      }
+    ]
+  },
+  {
+    "id": "template_personal_appointment",
+    "name": "Appointment Request",
+    "category": "personal",
+    "description": "Request an appointment and share your preferred date, time, and reason for meeting.",
+    "isBlank": false,
+    "gradient": "from-fuchsia-500 to-purple-500",
+    "formSettings": {
+      "isPublic": true,
+      "allowMultipleSubmissions": false
+    },
+    "schema": [
+      {
+        "id": "field_appointment_name",
+        "type": "short_answer",
+        "label": "Your Name",
+        "required": true,
+        "placeholder": "Enter your full name"
+      },
+      {
+        "id": "field_appointment_email",
+        "type": "email",
+        "label": "Email Address",
+        "required": true,
+        "placeholder": "you@example.com"
+      },
+      {
+        "id": "field_appointment_reason",
+        "type": "short_answer",
+        "label": "Reason for Appointment",
+        "required": true,
+        "placeholder": "Briefly describe what you would like to discuss"
+      },
+      {
+        "id": "field_appointment_date",
+        "type": "date",
+        "label": "Preferred Date",
+        "required": true
+      },
+      {
+        "id": "field_appointment_time",
+        "type": "dropdown",
+        "label": "Preferred Time",
+        "required": true,
+        "options": ["Morning", "Afternoon", "Evening"]
+      },
+      {
+        "id": "field_appointment_notes",
+        "type": "long_answer",
+        "label": "Additional Notes",
+        "required": false,
+        "placeholder": "Share any scheduling needs or other information"
+      }
+    ]
+  },
+  {
+    "id": "template_event_rsvp",
+    "name": "Event RSVP",
+    "category": "event",
+    "description": "Track attendance, guest count, and meal preferences for an upcoming event.",
+    "isBlank": false,
+    "gradient": "from-emerald-500 to-teal-500",
+    "formSettings": {
+      "isPublic": true,
+      "allowMultipleSubmissions": false
+    },
+    "schema": [
+      {
+        "id": "field_rsvp_name",
+        "type": "short_answer",
+        "label": "Your Name",
+        "required": true,
+        "placeholder": "Enter your full name"
+      },
+      {
+        "id": "field_rsvp_email",
+        "type": "email",
+        "label": "Email Address",
+        "required": true,
+        "placeholder": "you@example.com"
+      },
+      {
+        "id": "field_rsvp_attending",
+        "type": "multiple_choice",
+        "label": "Will you attend?",
+        "required": true,
+        "options": ["Yes, I'll be there", "No, I can't attend"]
+      },
+      {
+        "id": "field_rsvp_guests",
+        "type": "number",
+        "label": "Number of Guests (including yourself)",
+        "required": true,
+        "placeholder": "1"
+      },
+      {
+        "id": "field_rsvp_meal",
+        "type": "dropdown",
+        "label": "Meal Preference",
+        "required": false,
+        "options": ["No preference", "Vegetarian", "Vegan", "Gluten-free"]
+      },
+      {
+        "id": "field_rsvp_accessibility",
+        "type": "long_answer",
+        "label": "Accessibility or Dietary Requirements",
+        "required": false,
+        "placeholder": "Let us know about any requirements"
+      }
+    ]
+  },
+  {
+    "id": "template_event_party_invitation",
+    "name": "Party Invitation",
+    "category": "event",
+    "description": "Invite guests to a celebration and collect their attendance and planning details.",
+    "isBlank": false,
+    "gradient": "from-fuchsia-500 to-pink-500",
+    "formSettings": {
+      "isPublic": true,
+      "allowMultipleSubmissions": false
+    },
+    "schema": [
+      {
+        "id": "field_party_guest_name",
+        "type": "short_answer",
+        "label": "Guest Name",
+        "required": true,
+        "placeholder": "Enter your name"
+      },
+      {
+        "id": "field_party_attendance",
+        "type": "multiple_choice",
+        "label": "Can you make it?",
+        "required": true,
+        "options": ["Yes, happily!", "Sorry, I can't make it"]
+      },
+      {
+        "id": "field_party_guests",
+        "type": "dropdown",
+        "label": "How many people are coming with you?",
+        "required": true,
+        "options": ["Just me", "1 guest", "2 guests", "3 guests"]
+      },
+      {
+        "id": "field_party_dietary",
+        "type": "short_answer",
+        "label": "Dietary Requirements",
+        "required": false,
+        "placeholder": "Optional"
+      },
+      {
+        "id": "field_party_message",
+        "type": "long_answer",
+        "label": "Leave a Message",
+        "required": false,
+        "placeholder": "Write a note for the host"
+      }
+    ]
+  },
+  {
+    "id": "template_event_feedback",
+    "name": "Event Feedback",
+    "category": "event",
+    "description": "Gather attendee feedback on an event's content, organization, and overall experience.",
+    "isBlank": false,
+    "gradient": "from-amber-400 to-orange-500",
+    "formSettings": {
+      "isPublic": true,
+      "allowMultipleSubmissions": false
+    },
+    "schema": [
+      {
+        "id": "field_event_feedback_name",
+        "type": "short_answer",
+        "label": "Event Name",
+        "required": true,
+        "placeholder": "Which event did you attend?"
+      },
+      {
+        "id": "field_event_feedback_rating",
+        "type": "rating",
+        "label": "How would you rate the event overall?",
+        "required": true,
+        "maxRating": 5
+      },
+      {
+        "id": "field_event_feedback_highlights",
+        "type": "checkboxes",
+        "label": "What did you enjoy?",
+        "required": false,
+        "options": ["Speakers", "Activities", "Venue", "Food", "Networking"]
+      },
+      {
+        "id": "field_event_feedback_organization",
+        "type": "multiple_choice",
+        "label": "How was the event organization?",
+        "required": true,
+        "options": ["Excellent", "Good", "Fair", "Needs improvement"]
+      },
+      {
+        "id": "field_event_feedback_suggestions",
+        "type": "long_answer",
+        "label": "What could we improve for next time?",
+        "required": false,
+        "placeholder": "Share your suggestions"
+      }
+    ]
   }
 ]
